@@ -4,6 +4,9 @@
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-1.2.4.js"></script>
+        <script data-require="angular.js@1.5.0" data-semver="1.5.0" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.js"></script>
+
        
 </head>
     <body ng-app="viewApp">
@@ -13,13 +16,13 @@
        <div class="container">
         <div ng-controller="studentController">
                 <table class="table table-striped table table-bordered">
-                    <tr><td>Transaction ID</td><td>First Name</td><td>Last Name</td><td>Email</td><td>Phone</td></tr>
+                    <tr><td>Transaction ID</td><td>First Name</td><td>Last Name</td><td>Phone</td><td>Action</td></tr>
                     <tr ng-repeat="x in students">
                         <td>{{x.StudentID}}</td>
                         <td>{{x.FirstName}}</td>
                         <td>{{x.LastName}}</td>
                         <td>{{x.Phone}}</td>
-                        <td><a href="deleteStudents.php?id={{$index}}">Delete | </a><a href="update.php?id={{$index}}">Update</a></td>
+                        <td><button type="button" ng-click="openModal(x.StudentID)" confirm="Are you sure you want to delete, {{x.FirstName}} {{x.LastName}}?"  confirm-settings="{size: 'sm'}">Delete</button> | </a><a href="update.php?id={{$index}}">Update</a></td>
                     </tr>
                 </table>
             </div>
@@ -27,9 +30,41 @@
     </body>
 </html>
 <script>
-        var app = angular.module('viewApp', []);
-        app.controller('studentController', function($scope, $http) {
+        var app = angular.module('viewApp', ['ui.bootstrap']);
+        app.controller('studentController', function($scope, $http, $uibModal) {
             $http.get("getStudents.php")
-            .then(function (response) {$scope.students = response.data.records;});
+            .then(function (response) {$scope.students = response.data.records;
+            
+            });
+
+            $scope.openModal = function(idx) { 
+            var data = $.param({id:idx});
+            
+            $uibModal.open({
+                templateUrl: 'modal.html',
+                controller: function ($scope, $uibModalInstance) {
+                    $scope.ok = function () {
+                     $http.delete('deleteStudents.php?' + data)
+                    .success(function (data, status, headers) {
+                    $uibModalInstance.close();
+                    location.reload();
+                    })
+            .error(function (data, status, header, config) {
+                $scope.ServerResponse = htmlDecode("Data: " + data +
+                    "\n\n\n\nstatus: " + status +
+                    "\n\n\n\nheaders: " + header +
+                    "\n\n\n\nconfig: " + config);
+            });
+
+                    };
+      
+                $scope.cancel = function () {
+                $uibModalInstance.dismiss('cancel');
+                location.reload();
+                };
+      }
+    })
+          }
         });
+
 </script>

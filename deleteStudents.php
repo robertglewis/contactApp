@@ -13,7 +13,7 @@
 
 
 //**********************************SQL LITE CONNECTION******************************************************** */
-$db =  new SQLite3('robbase');
+$db =  new SQLite3('DATABASE/robbase');
 $ID =$_GET['id'];
 $sql = "DELETE from rgltable where memID= '$ID'";
 $db->exec($sql);

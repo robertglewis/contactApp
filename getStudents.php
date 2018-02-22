@@ -13,7 +13,7 @@
 
 
 //**********************************SQL LITE CONNECTION******************************************************** */
-$db =  new SQLite3('robbase');
+$db =  new SQLite3('DATABASE/robbase');
 
 $result = $db->query('SELECT memID,lname,fname,phone from rgltable');
 
